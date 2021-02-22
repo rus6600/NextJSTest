@@ -1,65 +1,105 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
+import {useState, useEffect} from "react";
 
-export default function Home() {
+
+function Home(props) {
+
+    const [base, setBase] = useState(props.data)
+    const [query,setQuery] = useState("")
+    const [select, setSelect] = useState("")
+    const [showModal, setShowModal] = useState(false)
+    const [modalInfo, setModalInfo] = useState(null)
+    const  okHandler = async (e) => {
+        setQuery(e)
+        const res = await fetch(`http://localhost:4200/results?q=${query}`)
+        const data = await res.json()
+        setBase(data)
+    }
+    const selectHandler = e => {
+        setSelect(e)
+        console.log(select)
+     
+    }
+
+    useEffect(() => {
+        setBase(
+            props.data.filter(el => el.genres.some(elem => elem === select))
+        )
+        console.log(base)
+
+    },[select] )
+
+    useEffect(() => {
+        setBase(props.data)
+    },[])
+
+    function getGenres() {
+        const genres = []
+        props.data.map(el => {
+            genres.push(...el.genres)
+        })
+        genres.sort()
+        const arr = genres.filter((el,id) => el !== genres[id+1])
+        return arr
+    }
+
+
+
+
+
+
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+        <div className="wrapper">
+            <div className="header">
+                <input type="text" onChange={() => okHandler(event.target.value)}></input>
+                <select onChange={() => selectHandler(event.target.value)}>
+                    {getGenres().map((el,id) => <option id={id} value={el}>{el}</option>)}
+                </select>
+              
+            </div>
+            <div className="glass">   
+                {base.map(item => {
+                    return (
+                        <div key={item.name} className="card-item">
+                            <img src={item.img}/>
+                            <div className="card-info">
+                                <h1>{item.name}</h1>
+                                <p>{item.length}</p>
+                                <p>{item.rate}</p>
+                                <p>{item.genres.join(" ")}</p>
+                                <p>{item.description}</p>
+                            </div>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+                        </div>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+                    )
+                })}
+                           </div>
+            <div className="circle1"></div>
+    <div className="circle2"></div>
+         </div>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
   )
 }
+
+export async function getStaticProps(context) {
+    console.log(context)
+    const res = await fetch(`http://localhost:4200/results`)
+    const data = await res.json()
+
+    if (!data) {
+        return {
+            notFound: true,
+        }
+    }
+
+    return {
+        props: {data}
+    }
+}
+
+
+export default Home
