@@ -3,7 +3,7 @@ function Header(props) {
         props.setQuery(e);
         const res = await fetch(`http://localhost:4200/results?q=${props.query}`);
         const data = await res.json();
-        if (data.length === 0) {
+        if (data.length) {
             props.setQuery(e.replace(/\s/g, ''));
         }
         props.setBase(data);
