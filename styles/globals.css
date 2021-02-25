@@ -27,7 +27,7 @@ h3 {
 .wrapper {
   font-family: "Poppins", sans-serif;
   min-height: 100vh;
-  background: linear-gradient(to right top, #65dfc9, #6cdbeb);
+  background: linear-gradient(to right top, #9e65df, #1e1a5f);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -72,6 +72,14 @@ h3 {
   z-index: 4;
   border: none;
   margin-left: 30px;
+  width: 200px;
+  height: 30px;
+  background: linear-gradient(
+    to right bottom,
+    rgba(255, 255, 255, 0.7),
+    rgba(255, 255, 255, 0.3)
+  );
+  border-radius: 10px;
 }
 
 
